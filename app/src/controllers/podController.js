@@ -4,7 +4,7 @@ const fs = require('fs');
 exports.createPod = (req, res) => {
     const { teamLabel, envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
 
-    // Create the pod manifest with soft node affinity (preferredDuringScheduling)
+    // Create the pod manifest with the environment container and the SSH container
     const podManifest = {
         apiVersion: 'v1',
         kind: 'Pod',
@@ -33,23 +33,38 @@ exports.createPod = (req, res) => {
                     ]
                 }
             },
-            containers: [{
-                name: envName,
-                image: image,
-                resources: {
-                    requests: {
-                        cpu: cpuRequest,
-                        memory: memoryRequest
+            containers: [
+                {
+                    name: envName,
+                    image: image,
+                    resources: {
+                        requests: {
+                            cpu: cpuRequest,
+                            memory: memoryRequest
+                        },
+                        limits: {
+                            cpu: cpuLimit,
+                            memory: memoryLimit
+                        }
                     },
-                    limits: {
-                        cpu: cpuLimit,
-                        memory: memoryLimit
-                    }
+                    ports: [{
+                        containerPort: 3000
+                    }]
                 },
-                ports: [{
-                    containerPort: 3000
-                }]
-            }]
+                {
+                    name: 'ssh-sidecar',
+                    image: 'rastasheep/ubuntu-sshd:18.04',  // Example SSHD image
+                    ports: [{
+                        containerPort: 22  // Expose SSH on port 22
+                    }],
+                    env: [
+                        {
+                            name: 'ROOT_PASSWORD',
+                            value: 'yourpassword'  // For testing purposes
+                        }
+                    ]
+                }
+            ]
         }
     };
 

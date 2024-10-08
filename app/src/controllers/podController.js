@@ -127,18 +127,22 @@ exports.createPod = (req, res) => {
 
             console.log(`Service created successfully: ${serviceStdout}`);
             
-            // Get the node IP
-            const getNodeIPCommand = `kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'`;
-            exec(getNodeIPCommand, (nodeIPError, nodeIPStdout, nodeIPStderr) => {
-                if (nodeIPError) {
-                    console.error(`Error getting node IP: ${nodeIPError.message}`);
-                    return res.status(500).send('Failed to get node IP');
+            // Get the pod IP
+            const getPodIPCommand = `kubectl get pod ${envName} -o jsonpath='{.status.podIP}'`;
+            exec(getPodIPCommand, (podIPError, podIPStdout, podIPStderr) => {
+                if (podIPError) {
+                    console.error(`Error getting pod IP: ${podIPError.message}`);
+                    return res.status(500).send('Failed to get pod IP');
                 }
 
-                const nodeIP = nodeIPStdout.trim();
-                const sshCommand = `ssh root@${nodeIP} -p ${nodePort}`;
+                const podIP = podIPStdout.trim();
+                const sshCommandNodePort = `ssh root@localhost -p ${nodePort}`;
+                const sshCommandPodIP = `ssh root@${podIP} -p 22`;
 
-                return res.send(`<div style="color: green;">Pod and SSH service created successfully. Use the following SSH command: <code>${sshCommand}</code></div>`);
+                return res.send(`<div style="color: green;">Pod and SSH service created successfully.<br>
+                Use the following SSH commands:<br>
+                <strong>From outside the cluster (via NodePort):</strong> <code>${sshCommandNodePort}</code><br>
+                <strong>From inside the cluster (via Pod IP):</strong> <code>${sshCommandPodIP}</code></div>`);
             });
         });
     });

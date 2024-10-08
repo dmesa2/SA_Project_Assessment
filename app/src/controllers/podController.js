@@ -60,7 +60,7 @@ exports.createPod = (req, res) => {
                     env: [
                         {
                             name: 'ROOT_PASSWORD',
-                            value: 'yourpassword'  // For testing purposes
+                            value: 'yourpassword'  // For testing, use key-based auth in production
                         }
                     ]
                 }
@@ -85,6 +85,61 @@ exports.createPod = (req, res) => {
         }
 
         console.log(`stdout: ${stdout}`);
-        return res.send(`<div style="color: green;">Pod created successfully</div>`);
+        
+        // After the pod is created, create the NodePort service for SSH
+        const nodePort = 30000 + Math.floor(Math.random() * 1000);  // Random NodePort
+        const serviceManifest = {
+            apiVersion: 'v1',
+            kind: 'Service',
+            metadata: {
+                name: `${envName}-ssh-service`
+            },
+            spec: {
+                selector: {
+                    app: envName  // Ensure this matches the pod's labels
+                },
+                ports: [
+                    {
+                        protocol: 'TCP',
+                        port: 22,           // SSH port in the container
+                        targetPort: 22,     // Target container port
+                        nodePort: nodePort  // NodePort
+                    }
+                ],
+                type: 'NodePort'
+            }
+        };
+
+        const serviceManifestFile = `/tmp/${envName}-service.yml`;
+        fs.writeFileSync(serviceManifestFile, JSON.stringify(serviceManifest, null, 2));
+
+        // Apply the service manifest using kubectl
+        const serviceCommand = `kubectl apply -f ${serviceManifestFile}`;
+        exec(serviceCommand, (serviceError, serviceStdout, serviceStderr) => {
+            if (serviceError) {
+                console.error(`Error creating service: ${serviceError.message}`);
+                return res.status(500).send('Failed to create the SSH service');
+            }
+            if (serviceStderr) {
+                console.error(`stderr: ${serviceStderr}`);
+                return res.status(500).send('Error occurred during SSH service creation');
+            }
+
+            console.log(`Service created successfully: ${serviceStdout}`);
+            
+            // Get the node IP
+            const getNodeIPCommand = `kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'`;
+            exec(getNodeIPCommand, (nodeIPError, nodeIPStdout, nodeIPStderr) => {
+                if (nodeIPError) {
+                    console.error(`Error getting node IP: ${nodeIPError.message}`);
+                    return res.status(500).send('Failed to get node IP');
+                }
+
+                const nodeIP = nodeIPStdout.trim();
+                const sshCommand = `ssh root@${nodeIP} -p ${nodePort}`;
+
+                return res.send(`<div style="color: green;">Pod and SSH service created successfully. Use the following SSH command: <code>${sshCommand}</code></div>`);
+            });
+        });
     });
 };

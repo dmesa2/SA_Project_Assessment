@@ -4,7 +4,7 @@ const fs = require('fs');
 exports.createPod = (req, res) => {
     const { teamLabel, envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
 
-    // Create the pod manifest with team label and node affinity
+    // Create the pod manifest with soft node affinity (preferredDuringScheduling)
     const podManifest = {
         apiVersion: 'v1',
         kind: 'Pod',
@@ -17,15 +17,20 @@ exports.createPod = (req, res) => {
         spec: {
             affinity: {
                 nodeAffinity: {
-                    requiredDuringSchedulingIgnoredDuringExecution: {
-                        nodeSelectorTerms: [{
-                            matchExpressions: [{
-                                key: "team",
-                                operator: "In",
-                                values: [teamLabel]
-                            }]
-                        }]
-                    }
+                    preferredDuringSchedulingIgnoredDuringExecution: [
+                        {
+                            weight: 1, // Weight can be between 1 and 100 (higher is more preferred)
+                            preference: {
+                                matchExpressions: [
+                                    {
+                                        key: "team",
+                                        operator: "In",
+                                        values: [teamLabel]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 }
             },
             containers: [{

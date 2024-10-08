@@ -40,6 +40,7 @@ This project provides employees with the ability to launch multiple development 
 - kubectl_ui is packaged via helm and deployed seamlessly.
 - **Files**:
   - `helm/templates/deployment.yml`: Defines pod deployment configuration in Kubernetes.
+  - `helm/templates/serviceaccount.yml`: Provides admin privileges to the kubectl_ui pod.
   - `helm/templates/service.yml`: Kubernetes service configuration for exposing the pods.
 
 ### 5. **Monitoring with Grafana**

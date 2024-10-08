@@ -132,4 +132,4 @@ This setup allows for efficient development environment management with full res
 
 ## Video Demonstration of the Project
 
-[kubectl_ui_video](www.youtube.com)
+[Video Demonstration](https://youtu.be/2UJ5vjCnkJU)

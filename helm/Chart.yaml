@@ -1,0 +1,7 @@
+apiVersion: v2
+name: kubectl-ui
+description: A Helm chart for deploying the kubectl-ui app
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies: []

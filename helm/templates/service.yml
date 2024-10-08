@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubectl-ui-service
+spec:
+  type: NodePort
+  selector:
+    app: kubectl-ui
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30080

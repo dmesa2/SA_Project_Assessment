@@ -41,14 +41,14 @@ exports.createPod = (req, res) => {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing command: ${error.message}`);
-            return res.status(500).send('Failed to create the pod');
+            return res.send(`<div style="color: red;">Failed to create the pod: ${error.message}</div>`);
         }
         if (stderr) {
             console.error(`stderr: ${stderr}`);
-            return res.status(500).send('Error occurred during pod creation');
+            return res.send(`<div style="color: red;">Error occurred during pod creation: ${stderr}</div>`);
         }
 
         console.log(`stdout: ${stdout}`);
-        return res.send('Pod created successfully');
+        return res.send(`<div style="color: green;">Pod created successfully</div>`);
     });
 };

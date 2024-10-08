@@ -60,8 +60,15 @@
         document.getElementById('createPodForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent form from submitting the traditional way
 
-            const formData = new FormData(this); // Capture form data
-            const formObject = Object.fromEntries(formData); // Convert form data to JSON-friendly object
+            // Capture form data as JSON
+            const formObject = {
+                envName: document.getElementById('envName').value,
+                image: document.getElementById('image').value,
+                cpuRequest: document.getElementById('cpuRequest').value,
+                memoryRequest: document.getElementById('memoryRequest').value,
+                cpuLimit: document.getElementById('cpuLimit').value,
+                memoryLimit: document.getElementById('memoryLimit').value,
+            };
 
             // Submit the form data using fetch
             const response = await fetch('/create-pod', {

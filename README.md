@@ -7,7 +7,7 @@ This project provides employees with the ability to launch multiple development 
 - **Docker Image Creation**: The environments are built as Docker images, which can be customized based on the selected base image and requirements.
 - **Deployment to Kubernetes**: Docker images are deployed as Kubernetes pods with the requested resources.
 - **Monitoring with Grafana**: Grafana is set up to monitor pod resource usage, tracking CPU and memory requested vs used.
-- **SSH and SFTP Access**: Each deployed environment allows SSH and SFTP access, requiring DNS automation to assign and manage access.
+- **SSH**: Each deployed environment allows for SSH access via an SSH sidecar deployed in each environment pod.
 - **Autoscaling and Monitoring**: The cluster can autoscale based on resource utilization, ensuring idle or underutilized resources are downscaled as necessary.
 
 ---
@@ -83,8 +83,7 @@ This project provides employees with the ability to launch multiple development 
 
 ### Notes:
 
-- The **Grafana** data source is configured in `grafana/datasource.txt`.
-- All **Helm** charts for Kubernetes deployment are located in `helm/`.
+- All **Helm** charts for Kubernetes deployment of **kubectl_ui** are located in `helm/`.
 
 This setup allows for efficient development environment management with full resource monitoring, automatic scaling, and seamless CI/CD integration.
 

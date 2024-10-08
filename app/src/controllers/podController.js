@@ -4,22 +4,6 @@ const fs = require('fs');
 exports.createPod = (req, res) => {
     const { envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
 
-    // Log the received values to confirm they are being captured correctly
-    console.log('Received Values:', {
-        envName,
-        image,
-        cpuRequest,
-        memoryRequest,
-        cpuLimit,
-        memoryLimit
-    });
-
-    // Check if envName is defined and valid
-    if (!envName || envName.trim() === '') {
-        console.error('Environment name is missing or undefined');
-        return res.status(400).send('Environment name is required');
-    }
-
     // Create the pod manifest
     const podManifest = {
         apiVersion: 'v1',

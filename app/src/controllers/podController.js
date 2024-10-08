@@ -1,12 +1,43 @@
 const { exec } = require('child_process');
+const fs = require('fs');
 
 exports.createPod = (req, res) => {
-    const { image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
+    const { envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
 
-    // Build the kubectl run command
-    const command = `kubectl run my-pod --image=${image} --requests=cpu=${cpuRequest},memory=${memoryRequest} --limits=cpu=${cpuLimit},memory=${memoryLimit}`;
+    // Create the pod manifest
+    const podManifest = {
+        apiVersion: 'v1',
+        kind: 'Pod',
+        metadata: {
+            name: envName
+        },
+        spec: {
+            containers: [{
+                name: envName,
+                image: image,
+                resources: {
+                    requests: {
+                        cpu: cpuRequest,
+                        memory: memoryRequest
+                    },
+                    limits: {
+                        cpu: cpuLimit,
+                        memory: memoryLimit
+                    }
+                },
+                ports: [{
+                    containerPort: 3000
+                }]
+            }]
+        }
+    };
 
-    // Execute the command
+    // Write the pod manifest to a temporary file
+    const podManifestFile = `/tmp/${envName}-pod.yml`;
+    fs.writeFileSync(podManifestFile, JSON.stringify(podManifest, null, 2));
+
+    // Apply the pod manifest using kubectl
+    const command = `kubectl apply -f ${podManifestFile}`;
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing command: ${error.message}`);
@@ -16,6 +47,7 @@ exports.createPod = (req, res) => {
             console.error(`stderr: ${stderr}`);
             return res.status(500).send('Error occurred during pod creation');
         }
+
         console.log(`stdout: ${stdout}`);
         return res.send('Pod created successfully');
     });

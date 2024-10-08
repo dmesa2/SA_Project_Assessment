@@ -9,7 +9,11 @@
 <body>
     <div class="container mt-5">
         <h1 class="mb-4 text-center">Create a New Development Environment</h1>
-        <form action="/create-pod" method="POST">
+
+        <!-- Success/Failure Message will be shown here -->
+        <iframe id="responseFrame" name="responseFrame" style="border:none;width:100%;height:50px;"></iframe>
+
+        <form action="/create-pod" method="POST" target="responseFrame">
             <!-- Environment Name (Pod Name) -->
             <div class="mb-3">
                 <label for="envName" class="form-label">Environment Name:</label>

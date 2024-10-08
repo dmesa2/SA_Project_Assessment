@@ -128,3 +128,7 @@ This setup allows for efficient development environment management with full res
    ```
 
 7. Open the web interface at `http://localhost:30080` to spin up the development environments. Use the form to specify resources, and check the created pod in the Grafana dashboard.
+
+## Video Demonstration of the Project
+
+[kubectl_ui_video](www.youtube.com)

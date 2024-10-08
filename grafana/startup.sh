@@ -25,4 +25,4 @@ kubectl get svc grafana-nodeport --namespace monitoring
 # Display message with Grafana access information
 NODE_PORT=$(kubectl get svc grafana-nodeport --namespace monitoring -o=jsonpath='{.spec.ports[0].nodePort}')
 NODE_IP=$(kubectl get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
-echo "Grafana is accessible via http://$NODE_IP:$NODE_PORT with username 'admin' and password 'admin'"
+echo "Grafana is accessible via http://localhost:$NODE_PORT with username 'admin' and password 'admin'"

@@ -11,6 +11,16 @@
         <h1 class="mb-4 text-center">Create a New Development Environment</h1>
 
         <form action="/create-pod" method="POST" target="responseFrame">
+            <!-- Team Label Dropdown -->
+            <div class="mb-3">
+                <label for="teamLabel" class="form-label">Team Label:</label>
+                <select class="form-control" id="teamLabel" name="teamLabel" required>
+                    <option value="DevOps">DevOps</option>
+                    <option value="Developers">Developers</option>
+                    <option value="NonDevs">NonDevs</option>
+                </select>
+            </div>
+
             <!-- Environment Name (Pod Name) -->
             <div class="mb-3">
                 <label for="envName" class="form-label">Environment Name:</label>

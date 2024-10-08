@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kubectl-ui-deployment
-  labels:
-    app: kubectl-ui
 spec:
-  replicas: 1
+  replicas: 1  # Initial number of replicas (HPA will manage scaling)
   selector:
     matchLabels:
       app: kubectl-ui
@@ -14,9 +12,13 @@ spec:
       labels:
         app: kubectl-ui
     spec:
-      serviceAccountName: kubectl-ui-sa
       containers:
       - name: kubectl-ui
         image: dmesa2/kubectl_ui:latest
+        resources:
+          requests:
+            cpu: "100m"
+          limits:
+            cpu: "200m"
         ports:
         - containerPort: 3000

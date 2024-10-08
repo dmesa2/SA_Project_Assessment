@@ -2,16 +2,32 @@ const { exec } = require('child_process');
 const fs = require('fs');
 
 exports.createPod = (req, res) => {
-    const { envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
+    const { teamLabel, envName, image, cpuRequest, memoryRequest, cpuLimit, memoryLimit } = req.body;
 
-    // Create the pod manifest
+    // Create the pod manifest with team label and node affinity
     const podManifest = {
         apiVersion: 'v1',
         kind: 'Pod',
         metadata: {
-            name: envName
+            name: envName,
+            labels: {
+                team: teamLabel
+            }
         },
         spec: {
+            affinity: {
+                nodeAffinity: {
+                    requiredDuringSchedulingIgnoredDuringExecution: {
+                        nodeSelectorTerms: [{
+                            matchExpressions: [{
+                                key: "team",
+                                operator: "In",
+                                values: [teamLabel]
+                            }]
+                        }]
+                    }
+                }
+            },
             containers: [{
                 name: envName,
                 image: image,
@@ -41,11 +57,11 @@ exports.createPod = (req, res) => {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing command: ${error.message}`);
-            return res.send(`<div style="color: red;">Failed to create the pod: ${error.message}</div>`);
+            return res.status(500).send('Failed to create the pod');
         }
         if (stderr) {
             console.error(`stderr: ${stderr}`);
-            return res.send(`<div style="color: red;">Error occurred during pod creation: ${stderr}</div>`);
+            return res.status(500).send('Error occurred during pod creation');
         }
 
         console.log(`stdout: ${stdout}`);
